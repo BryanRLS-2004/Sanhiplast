@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: sanhiplast-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sanhiplast
+      POSTGRES_USER: sanhi_app
+      POSTGRES_PASSWORD: SanHi2026!
+    ports:
+      - "5432:5432"
+    volumes:
+      - sanhiplast_pgdata:/var/lib/postgresql/data
+      - ./init-db/01-schemas.sql:/docker-entrypoint-initdb.d/01-schemas.sql
+
+volumes:
+  sanhiplast_pgdata:

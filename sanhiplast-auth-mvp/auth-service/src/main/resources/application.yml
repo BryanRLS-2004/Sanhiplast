@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sanhiplast?currentSchema=auth
+    username: sanhi_app
+    password: SanHi2026!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: auth
+        format_sql: true
+    show-sql: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+app:
+  jwt:
+    secret: "c2FuaGlwbGFzdC1hdXRoLXNlcnZpY2Utand0LXNlY3JldC1rZXktMjAyNi1pbnRlZ3JhZG9yLWRvcw=="
+    expiration-minutes: 60
+
+logging:
+  level:
+    pe.sanhiplast: DEBUG
+    org.springframework.security: INFO
