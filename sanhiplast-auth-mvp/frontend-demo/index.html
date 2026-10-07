@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SanHi Plast - Login (prototipo de integracion)</title>
+<style>
+  :root {
+    --verde-oscuro: #1E4B3C;
+    --verde: #2E7D5B;
+    --verde-claro: #E8F3EC;
+    --texto: #1B1F1D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+    background: var(--verde-claro);
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    background: #fff;
+    width: 380px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(30,75,60,0.18);
+    overflow: hidden;
+  }
+  .card__header {
+    background: var(--verde-oscuro);
+    color: #fff;
+    padding: 22px 24px;
+  }
+  .card__header h1 { margin: 0; font-size: 20px; }
+  .card__header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+  .card__body { padding: 24px; }
+  label { display: block; font-size: 13px; margin-bottom: 6px; color: #444; }
+  input {
+    width: 100%; padding: 10px 12px; margin-bottom: 16px;
+    border: 1px solid #cfdad4; border-radius: 8px; font-size: 14px;
+  }
+  button {
+    width: 100%; padding: 11px; border: none; border-radius: 8px;
+    background: var(--verde); color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: var(--verde-oscuro); }
+  #resultado {
+    margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px;
+    white-space: pre-wrap; word-break: break-all; display: none;
+  }
+  #resultado.ok { display: block; background: #e6f4ea; border: 1px solid #2e7d5b; color: #1E4B3C; }
+  #resultado.error { display: block; background: #fdeaea; border: 1px solid #c0392b; color: #8a1f1f; }
+  .hint { font-size: 11px; color: #888; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="card__header">
+      <h1>SanHi Plast</h1>
+      <p>Prototipo de integracion Front-End &rarr; Auth Service (RF01)</p>
+    </div>
+    <div class="card__body">
+      <label for="username">Usuario / correo</label>
+      <input id="username" type="text" value="airton@sanhiplast.com" />
+      <label for="password">Contrasena</label>
+      <input id="password" type="password" value="Admin123!" />
+      <button onclick="login()">Ingresar al sistema</button>
+      <div id="resultado"></div>
+      <p class="hint">Este formulario llama directamente a http://localhost:8081/api/auth/login (microservicio Auth real). Requiere el backend corriendo y al menos un usuario registrado con run-tests.sh.</p>
+    </div>
+  </div>
+
+<script>
+async function login() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const resultado = document.getElementById('resultado');
+  resultado.className = '';
+  resultado.style.display = 'none';
+
+  try {
+    const resp = await fetch('http://localhost:8081/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await resp.json();
+
+    if (resp.ok) {
+      resultado.className = 'ok';
+      resultado.textContent =
+        'Bienvenido, ' + data.nombreCompleto + ' (rol: ' + data.rol + ')\n\n' +
+        'Token JWT recibido:\n' + data.token;
+    } else {
+      resultado.className = 'error';
+      resultado.textContent = 'Error ' + resp.status + ': ' + (data.mensaje || JSON.stringify(data));
+    }
+  } catch (err) {
+    resultado.className = 'error';
+    resultado.textContent = 'No se pudo contactar al servicio en localhost:8081. ' +
+      'Verifica que "mvn spring-boot:run" este corriendo.\n\nDetalle: ' + err;
+  }
+  resultado.style.display = 'block';
+}
+</script>
+</body>
+</html>
